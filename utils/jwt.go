@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -15,10 +14,10 @@ type Claims struct {
 }
 
 var jwtKey = []byte("JWT_SECRET_TOKEN_KEY")
-var expirationTime = time.Now().Add(24 * time.Hour)
 
 func GenerateSessionToken(email string, id string) string {
-	fmt.Print(expirationTime)
+	var expirationTime = time.Now().Add(24 * time.Hour)
+	// fmt.Print(expirationTime)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &Claims{
 		Email: email,

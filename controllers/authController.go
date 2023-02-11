@@ -16,6 +16,7 @@ import (
 
 var validate = validator.New()
 
+// Profile registration
 func ProfileRegistration(c *gin.Context) {
 	var user models.UserModel
 	if err := common.Bind(c, &user); err != nil {
@@ -44,6 +45,7 @@ func ProfileRegistration(c *gin.Context) {
 	c.JSONP(200, gin.H{"user": result})
 }
 
+// Profile login
 func LoginMethod(c *gin.Context) {
 	var body models.LoginBody
 	var user models.UserModel
