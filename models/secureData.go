@@ -12,6 +12,9 @@ type SecureDataModel struct {
 	UpdatedAt time.Time          `bson:"updatedAt"`
 	Content   string             `bson:"content" validate:"required"`
 	User      string             `bson:"user,omitempty"`
+	HashCode  string             `bson:"hashCode,omitempty"`
+	FinderKey string             `bson:"finderKey,omitempty"`
+	Url       string             `bson:"url,omitempty"`
 	// Protected bool               `bson:"protected"`
 }
 
