@@ -2,6 +2,7 @@ package utils
 
 import (
 	"math/rand"
+	"net/url"
 	"time"
 
 	"github.com/google/uuid"
@@ -34,4 +35,14 @@ func RandomStr(n int) string {
 //	}
 func GetCurrentTime() (time.Time, error) {
 	return time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+}
+
+func IsValidUrl(u string) bool {
+	// validator.
+	_, err := url.ParseRequestURI(u)
+	if err != nil {
+		return false
+	}
+	// fmt.Print(w)
+	return true
 }
