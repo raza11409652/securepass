@@ -7,18 +7,24 @@ import (
 )
 
 type SecureDataModel struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty"`
-	CreatedAt time.Time          `bson:"createdAt"`
-	UpdatedAt time.Time          `bson:"updatedAt"`
-	Content   string             `bson:"content" validate:"required"`
-	User      string             `bson:"user,omitempty"`
-	HashCode  string             `bson:"hashCode,omitempty"`
-	FinderKey string             `bson:"finderKey,omitempty"`
-	Url       string             `bson:"url,omitempty"`
+	ID             primitive.ObjectID `bson:"_id,omitempty"`
+	CreatedAt      time.Time          `bson:"createdAt"`
+	UpdatedAt      time.Time          `bson:"updatedAt"`
+	Content        string             `bson:"content" validate:"required"`
+	User           string             `bson:"user,omitempty"`
+	HashCode       string             `bson:"hashCode,omitempty"`
+	FinderKey      string             `bson:"finderKey,omitempty"`
+	Url            string             `bson:"url,omitempty"`
+	MaxViewAllowed int64              `bson:"maxViewAllowed,omitempty"`
 	// Protected bool               `bson:"protected"`
 }
 
-// type LoginBody struct {
-// 	Email    string `json:"email" validate:"required,email"`
-// 	Password string `json:"password" validate:"required"`
-// }
+type SecureDataHistoryModel struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
+	CreatedAt time.Time          `bson:"createdAt"`
+	UpdatedAt time.Time          `bson:"updatedAt"`
+	IpAddress string             `bson:"ipAddress,omitempty"`
+	Device    string             `bson:"device"`
+	Referrer  string             `bson:"referrer,omitempty"`
+	Content   primitive.ObjectID `bson:"content,omitempty"`
+}

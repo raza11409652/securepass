@@ -2,6 +2,7 @@ package utils
 
 import (
 	"math/rand"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -24,10 +25,13 @@ func RandomStr(n int) string {
 	return string(b)
 }
 
-// func GenerateSonyFlakeId() string {
-// 	result, error := sonyflake.NewSonyflake().NextID()
-// 	if error != nil {
-// 		log.Fatal(error)
-// 	}
-// 	return string(result)
-// }
+//	func GenerateSonyFlakeId() string {
+//		result, error := sonyflake.NewSonyflake().NextID()
+//		if error != nil {
+//			log.Fatal(error)
+//		}
+//		return string(result)
+//	}
+func GetCurrentTime() (time.Time, error) {
+	return time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+}

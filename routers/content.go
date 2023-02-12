@@ -7,4 +7,6 @@ import (
 
 func ContentRoutes(router *gin.RouterGroup) {
 	router.POST("/", controllers.NewContentPost)
+	router.GET("/:id", controllers.ViewContentPost)
+
 }
