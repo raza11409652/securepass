@@ -16,6 +16,7 @@ type UserModel struct {
 	LastLoginAt  bool               `bson:"lastLoginAt"`
 	Password     string             `bson:"password" validate:"required,min=8,max=255"`
 	ProfileImage string             `bson:"profileImage"`
+	Role         string             `bson:"role" validate:"oneof=ADMIN USER"`
 }
 
 type LoginBody struct {

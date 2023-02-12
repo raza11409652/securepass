@@ -8,23 +8,26 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Claims struct {
-	Email string `json:"email"`
-	Id    string `json:"id"`
+	Email string             `json:"email"`
+	Id    primitive.ObjectID `json:"id"`
+	Role  string             `json:"role"`
 	jwt.RegisteredClaims
 }
 
 var jwtKey = []byte("JWT_SECRET_TOKEN_KEY")
 
-func GenerateSessionToken(email string, id string) string {
+func GenerateSessionToken(email string, id primitive.ObjectID, role string) string {
 	var expirationTime = time.Now().Add(24 * time.Hour)
 	// fmt.Print(expirationTime)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &Claims{
 		Email: email,
 		Id:    id,
+		Role:  role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
 			ExpiresAt: jwt.NewNumericDate(expirationTime),

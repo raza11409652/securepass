@@ -19,6 +19,12 @@ var validate = validator.New()
 // Profile registration
 func ProfileRegistration(c *gin.Context) {
 	var user models.UserModel
+	team := c.Query("team")
+	if team != "" {
+		user.Role = "USER"
+	} else {
+		user.Role = "ADMIN"
+	}
 	if err := common.Bind(c, &user); err != nil {
 		// log.Panic(err)
 		c.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -76,6 +82,6 @@ func LoginMethod(c *gin.Context) {
 		"profile":   user.ProfileImage,
 		"email":     user.Email,
 	}
-	token := utils.GenerateSessionToken(user.Email, user.ID.String())
+	token := utils.GenerateSessionToken(user.Email, user.ID, user.Role)
 	c.JSONP(200, gin.H{"token": token, "profile": profile})
 }

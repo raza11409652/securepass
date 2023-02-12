@@ -6,5 +6,6 @@ func AppRouter(router *gin.RouterGroup) {
 	AuthRoutes(router.Group("/auth"))
 	UserRoutes(router.Group("/users"))
 	ContentRoutes(router.Group("/secure-content"))
+	TeamRoutes(router.Group("/team"))
 
 }

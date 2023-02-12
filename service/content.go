@@ -12,7 +12,7 @@ import (
 )
 
 var contentCollection *mongo.Collection = database.OpenCollection(database.MongoClient, "contents")
-var contentHistoryCollection *mongo.Collection = database.OpenCollection(database.MongoClient, "content_history")
+var contentHistoryCollection *mongo.Collection = database.OpenCollection(database.MongoClient, "content_histories")
 
 func InsertNewContent(c models.SecureDataModel) *mongo.InsertOneResult {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
