@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -16,16 +17,16 @@ import (
 )
 
 // Save new content post and generate new URL
-func NewContentPost(ctx *gin.Context) {
+func NewContentPost(w http.ResponseWriter, req *http.Request) {
 	var post models.SecureDataModel
-	if err := common.Bind(ctx, &post); err != nil {
-		ctx.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	validationErrors := validate.Struct(&post)
+	var body models.ContentBody
+	w.Header().Set("Content-Type", "application/json")
+	json.NewDecoder(req.Body).Decode(&body)
+	validationErrors := validate.Struct(body)
 	if validationErrors != nil {
 		commonError := common.NewError("error_message", validationErrors)
-		ctx.JSONP(http.StatusBadRequest, commonError)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(commonError)
 		return
 	}
 
@@ -39,7 +40,7 @@ func NewContentPost(ctx *gin.Context) {
 	// ctx.JSON(200, gin.H{"code": hashCode})
 
 	//Data encryption
-	encryption := utils.EncryptAES(hashCode, post.Content)
+	encryption := utils.EncryptAES(hashCode, body.Content)
 	post.Content = encryption
 	post.FinderKey = key
 	URL := "http://localhost:5173/secure-content/" + key + "#" + hashCode
@@ -49,8 +50,14 @@ func NewContentPost(ctx *gin.Context) {
 	}
 	// resultX := utils.DecryptAES(hashCode, encryption)
 	result := service.InsertNewContent(post)
-	ctx.JSON(200, gin.H{"id": result.InsertedID, "url": URL})
+	x := map[string]any{
+		"result": result.InsertedID,
+		"url":    URL,
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(x)
 	return
+	// return
 }
 
 func ViewContentPost(ctx *gin.Context) {
@@ -91,6 +98,7 @@ func ViewContentPost(ctx *gin.Context) {
 	history.Content = content.ID
 	result := service.InsertNewContentHistory(history)
 	content.Content = utils.DecryptAES(key, content.Content)
+	ctx.Header("Access-Control-Allow-Origin", "*")
 	ctx.JSON(http.StatusOK, gin.H{"h": result, "data": content})
 	return
 }

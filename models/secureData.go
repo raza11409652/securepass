@@ -19,6 +19,11 @@ type SecureDataModel struct {
 	// Protected bool               `bson:"protected"`
 }
 
+type ContentBody struct {
+	Content        string `json:"content" validate:"required"`
+	MaxViewAllowed int64  `json:"maxViewAllowed,omitempty"`
+	// Protected bool               `bson:"protected"`
+}
 type SecureDataHistoryModel struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty"`
 	CreatedAt time.Time          `bson:"createdAt"`

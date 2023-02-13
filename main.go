@@ -1,13 +1,16 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
 	"github.com/raza11409652/securepass/routers"
 )
 
 func main() {
-	r := gin.Default()
-	v1 := r.Group("/v1")
-	routers.AppRouter(v1.Group("/api"))
-	r.Run()
+	r := mux.NewRouter().StrictSlash(true)
+	routers.RouterMUX(r)
+	routers.RouterContent(r)
+	log.Fatal(http.ListenAndServe(":8080", r))
 }

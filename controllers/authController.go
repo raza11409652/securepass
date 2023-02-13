@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -51,29 +52,67 @@ func ProfileRegistration(c *gin.Context) {
 	c.JSONP(200, gin.H{"user": result})
 }
 
-// Profile login
-func LoginMethod(c *gin.Context) {
-	var body models.LoginBody
+func RegisterAccount(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	var user models.UserModel
-	if err := common.Bind(c, &body); err != nil {
-		c.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	var body models.RegisterBody
+	json.NewDecoder(req.Body).Decode(&body)
+	team := req.URL.Query().Get("team")
+	if team != "" {
+		user.Role = "USER"
+	} else {
+		user.Role = "ADMIN"
 	}
 	validationErrors := validate.Struct(body)
 	if validationErrors != nil {
 		commonError := common.NewError("error_message", validationErrors)
-		c.JSONP(http.StatusBadRequest, commonError)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(commonError)
+		return
+	}
+	count := service.GetUserCount(bson.M{"email": user.Email})
+	if count > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Email already registered")
+		return
+	}
+	user.Password = utils.GenerateBcryptHash(user.Password)
+	user.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	user.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	user.FirstName = body.FirstName
+	user.LastName = body.LastName
+	result := service.InsertNewUser(user)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+	return
+
+}
+
+// Profile login
+func LoginMethod(w http.ResponseWriter, req *http.Request) {
+	var body models.LoginBody
+	var user models.UserModel
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewDecoder(req.Body).Decode(&body)
+
+	validationErrors := validate.Struct(body)
+	if validationErrors != nil {
+		commonError := common.NewError("error_message", validationErrors)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(commonError)
 		return
 	}
 	err := service.GetUser(bson.M{"email": body.Email}).Decode(&user)
-	// fmt.Print(*userProfile)
 	if err == mongo.ErrNoDocuments {
-		c.JSONP(http.StatusNotFound, gin.H{"message": "Auth failed"})
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Auth failed")
 		return
 	}
 	flag := utils.CompareBcryptHash(body.Password, user.Password)
 	if !flag {
-		c.JSONP(http.StatusBadRequest, gin.H{"message": "Auth failed , Email and password mismatch"})
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Password combination failed")
 		return
 	}
 	profile := map[string]string{
@@ -83,5 +122,8 @@ func LoginMethod(c *gin.Context) {
 		"email":     user.Email,
 	}
 	token := utils.GenerateSessionToken(user.Email, user.ID, user.Role)
-	c.JSONP(200, gin.H{"token": token, "profile": profile})
+	response := map[string]any{"profile": profile, "token": token}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+	return
 }

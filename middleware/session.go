@@ -16,6 +16,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		// fmt.Print(claims)
+		// c.Header("Access-Control-Allow-Origin", "*")
 		c.Next()
 	}
 }
